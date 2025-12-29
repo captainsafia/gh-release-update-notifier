@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+    branches:
+      - main
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Set version for preview release
+        if: github.ref == 'refs/heads/main'
+        run: |
+          CURRENT_VERSION=$(node -e "console.log(require('./package.json').version)")
+          COMMIT_SHA=${GITHUB_SHA::7}
+          VERSION="${CURRENT_VERSION}-preview.${COMMIT_SHA}"
+          echo "Setting version to: ${VERSION}"
+          npm version "${VERSION}" --no-git-tag-version --allow-same-version
+
+      - name: Build
+        run: pnpm build
+
+      - name: Publish preview release
+        if: github.ref == 'refs/heads/main'
+        run: pnpm publish --access public --tag preview --no-git-checks
+        env:
+          NPM_CONFIG_PROVENANCE: true
+
+      - name: Publish official release
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: pnpm publish --access public --no-git-checks
+        env:
+          NPM_CONFIG_PROVENANCE: true
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          draft: false
+          prerelease: false

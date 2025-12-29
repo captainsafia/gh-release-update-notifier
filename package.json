@@ -1,0 +1,47 @@
+{
+  "name": "gh-release-update-notifier",
+  "type": "module",
+  "version": "1.0.0",
+  "packageManager": "pnpm@10.25.0",
+  "description": "Update notification API for CLIs published on GitHub Releases",
+  "author": "Safia Abdalla <safia@safia.rocks> (https://safia.rocks)",
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/captainsafia",
+  "homepage": "https://github.com/captainsafia/gh-release-update-notifier#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/captainsafia/gh-release-update-notifier.git"
+  },
+  "bugs": "https://github.com/captainsafia/gh-release-update-notifier/issues",
+  "keywords": [
+    "update-notifier",
+    "github-releases",
+    "cli",
+    "cli-tool",
+    "nodejs",
+    "typescript"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "prepublishOnly": "pnpm build",
+    "test": "vitest",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:types",
+    "tsdown": "catalog:cli",
+    "typescript": "catalog:cli",
+    "vitest": "catalog:testing"
+  }
+}
