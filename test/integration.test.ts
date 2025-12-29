@@ -5,11 +5,12 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { ReleaseNotifier } from '../src/index';
 import type { Release } from '../src/types';
 
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
 describe('Integration Tests (captainsafia/burrow)', () => {
   let notifier: ReleaseNotifier;
   let cacheFilePath: string;
-  
+
   // Fetched release data for comparison tests
   let latestStableRelease: Release | null = null;
   let latestPrerelease: Release | null = null;
@@ -19,6 +20,7 @@ describe('Integration Tests (captainsafia/burrow)', () => {
     const setupNotifier = new ReleaseNotifier({
       repo: 'captainsafia/burrow',
       checkInterval: 0,
+      token: GITHUB_TOKEN,
     });
     latestStableRelease = await setupNotifier.getLatestRelease();
     latestPrerelease = await setupNotifier.getLatestPrerelease();
@@ -29,6 +31,7 @@ describe('Integration Tests (captainsafia/burrow)', () => {
     notifier = new ReleaseNotifier({
       repo: 'captainsafia/burrow',
       checkInterval: 0, // Disable caching for fresh data in tests
+      token: GITHUB_TOKEN,
     });
   });
 
@@ -150,6 +153,7 @@ describe('Integration Tests (captainsafia/burrow)', () => {
         repo: 'captainsafia/burrow',
         checkInterval: 3600000, // 1 hour
         cacheFilePath,
+        token: GITHUB_TOKEN,
       });
 
       // First fetch - should hit the API
@@ -162,6 +166,7 @@ describe('Integration Tests (captainsafia/burrow)', () => {
         repo: 'captainsafia/burrow',
         checkInterval: 3600000,
         cacheFilePath,
+        token: GITHUB_TOKEN,
       });
 
       const release2 = await notifierWithCache2.getLatestRelease();
@@ -174,6 +179,7 @@ describe('Integration Tests (captainsafia/burrow)', () => {
         repo: 'captainsafia/burrow',
         checkInterval: 3600000,
         cacheFilePath,
+        token: GITHUB_TOKEN,
       });
 
       await notifierWithCache.getLatestRelease();
@@ -190,6 +196,7 @@ describe('Integration Tests (captainsafia/burrow)', () => {
       const badNotifier = new ReleaseNotifier({
         repo: 'captainsafia/this-repo-does-not-exist-12345',
         checkInterval: 0,
+        token: GITHUB_TOKEN,
       });
 
       await expect(badNotifier.getLatestRelease()).rejects.toThrow('GitHub API error');

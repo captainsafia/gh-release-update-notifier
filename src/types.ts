@@ -2,6 +2,7 @@ export interface ReleaseNotifierConfig {
   repo: string;
   checkInterval?: number;
   cacheFilePath?: string;
+  token?: string;
 }
 
 export interface Release {

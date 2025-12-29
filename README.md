@@ -100,6 +100,7 @@ notifier.clearCache();
 | `repo` | `string` | **required** | GitHub repository in `owner/repo` format |
 | `checkInterval` | `number` | `3600000` (1 hour) | Minimum time between API requests (in ms). Set to `0` to disable caching. |
 | `cacheFilePath` | `string` | `undefined` | Path to persist cache on disk |
+| `token` | `string` | `undefined` | GitHub token for authentication (increases rate limits and enables access to private repos) |
 
 #### Methods
 
@@ -161,6 +162,7 @@ interface ReleaseNotifierConfig {
   repo: string;
   checkInterval?: number;
   cacheFilePath?: string;
+  token?: string;
 }
 ```
 
@@ -176,6 +178,7 @@ const notifier = new ReleaseNotifier({
   repo: 'your-org/your-cli',
   checkInterval: 86400000, // Check once per day
   cacheFilePath: `${process.env.HOME}/.your-cli/update-cache.json`,
+  token: process.env.GITHUB_TOKEN, // Optional: for higher rate limits
 });
 
 async function checkForUpdates() {

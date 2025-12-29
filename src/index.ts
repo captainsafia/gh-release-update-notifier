@@ -7,6 +7,7 @@ export class ReleaseNotifier {
   private readonly repo: string;
   private readonly checkInterval: number;
   private readonly cacheFilePath: string | null;
+  private readonly token: string | null;
   private cachedReleases: GitHubReleaseResponse[] | null = null;
   private lastFetchTime: number = 0;
 
@@ -14,7 +15,8 @@ export class ReleaseNotifier {
     this.repo = config.repo;
     this.checkInterval = config.checkInterval ?? 3600000; // Default: 1 hour
     this.cacheFilePath = config.cacheFilePath ?? null;
-    
+    this.token = config.token ?? null;
+
     // Load cache from disk if available
     this.loadCacheFromDisk();
   }
@@ -175,14 +177,18 @@ export class ReleaseNotifier {
       return this.cachedReleases;
     }
 
+    const headers: Record<string, string> = {
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+    };
+
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+
     const response = await fetch(
       `https://api.github.com/repos/${this.repo}/releases`,
-      {
-        headers: {
-          'Accept': 'application/vnd.github+json',
-          'X-GitHub-Api-Version': '2022-11-28',
-        },
-      },
+      { headers },
     );
 
     if (!response.ok) {
