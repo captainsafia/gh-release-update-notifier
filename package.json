@@ -13,6 +13,9 @@
     "url": "git+https://github.com/captainsafia/gh-release-update-notifier.git"
   },
   "bugs": "https://github.com/captainsafia/gh-release-update-notifier/issues",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "keywords": [
     "update-notifier",
     "github-releases",
@@ -23,7 +26,10 @@
   ],
   "sideEffects": false,
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.mjs",

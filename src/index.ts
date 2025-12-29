@@ -92,66 +92,71 @@ export class ReleaseNotifier {
    * @returns Version check result with update availability information
    */
   async checkVersion(currentVersion: string, isPrerelease: boolean = false): Promise<VersionCheckResult> {
-    const releases = await this.fetchAllReleases();
-    
-    if (releases.length === 0) {
-      return {
-        updateAvailable: false,
-        currentVersion,
-        latestVersion: null,
-        latestRelease: null,
+    try {
+      const releases = await this.fetchAllReleases();
+
+      if (releases.length === 0) {
+        return {
+          updateAvailable: false,
+          currentVersion,
+          latestVersion: null,
+          latestRelease: null,
+        };
+      }
+
+      // Find the current release by tag name
+      const normalizedCurrent = this.normalizeVersion(currentVersion);
+      const currentRelease = releases.find(r =>
+        this.normalizeVersion(r.tag_name) === normalizedCurrent ||
+        r.tag_name === currentVersion
+      );
+
+      // Get the latest release based on isPrerelease flag
+      const latestRelease = isPrerelease
+        ? releases.find(r => r.prerelease && !r.draft)
+        : releases.find(r => !r.prerelease && !r.draft);
+
+      if (!latestRelease) {
+        return {
+          updateAvailable: false,
+          currentVersion,
+          latestVersion: null,
+          latestRelease: null,
+        };
+      }
+
+      const latest: Release = {
+        tagName: latestRelease.tag_name,
+        name: latestRelease.name,
+        prerelease: latestRelease.prerelease,
+        draft: latestRelease.draft,
+        htmlUrl: latestRelease.html_url,
+        publishedAt: latestRelease.published_at,
       };
-    }
 
-    // Find the current release by tag name
-    const normalizedCurrent = this.normalizeVersion(currentVersion);
-    const currentRelease = releases.find(r => 
-      this.normalizeVersion(r.tag_name) === normalizedCurrent ||
-      r.tag_name === currentVersion
-    );
+      // If current release not found in releases, assume update is available
+      if (!currentRelease) {
+        return {
+          updateAvailable: true,
+          currentVersion,
+          latestVersion: latestRelease.tag_name,
+          latestRelease: latest,
+        };
+      }
 
-    // Get the latest release based on isPrerelease flag
-    const latestRelease = isPrerelease
-      ? releases.find(r => r.prerelease && !r.draft)
-      : releases.find(r => !r.prerelease && !r.draft);
+      // Compare by publish date
+      const updateAvailable = this.isVersionOlder(currentRelease.published_at, latestRelease.published_at);
 
-    if (!latestRelease) {
       return {
-        updateAvailable: false,
-        currentVersion,
-        latestVersion: null,
-        latestRelease: null,
-      };
-    }
-
-    const latest: Release = {
-      tagName: latestRelease.tag_name,
-      name: latestRelease.name,
-      prerelease: latestRelease.prerelease,
-      draft: latestRelease.draft,
-      htmlUrl: latestRelease.html_url,
-      publishedAt: latestRelease.published_at,
-    };
-
-    // If current release not found in releases, assume update is available
-    if (!currentRelease) {
-      return {
-        updateAvailable: true,
+        updateAvailable,
         currentVersion,
         latestVersion: latestRelease.tag_name,
         latestRelease: latest,
       };
     }
-
-    // Compare by publish date
-    const updateAvailable = this.isVersionOlder(currentRelease.published_at, latestRelease.published_at);
-
-    return {
-      updateAvailable,
-      currentVersion,
-      latestVersion: latestRelease.tag_name,
-      latestRelease: latest,
-    };
+    catch (error) {
+      throw new Error(`Failed to check version: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   /**

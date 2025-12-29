@@ -6,7 +6,7 @@ export interface ReleaseNotifierConfig {
 
 export interface Release {
   tagName: string;
-  name: string;
+  name: string | null;
   prerelease: boolean;
   draft: boolean;
   htmlUrl: string;
@@ -22,7 +22,7 @@ export interface VersionCheckResult {
 
 export interface GitHubReleaseResponse {
   tag_name: string;
-  name: string;
+  name: string | null;
   html_url: string;
   published_at: string;
   prerelease: boolean;
