@@ -39,9 +39,9 @@
     "typecheck": "tsc"
   },
   "devDependencies": {
-    "@types/node": "catalog:types",
-    "tsdown": "catalog:cli",
-    "typescript": "catalog:cli",
-    "vitest": "catalog:testing"
+    "@types/node": "^22.10.2",
+    "tsdown": "^0.9.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
   }
 }
