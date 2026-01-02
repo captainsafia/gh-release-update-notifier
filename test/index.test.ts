@@ -291,11 +291,11 @@ describe('ReleaseNotifier', () => {
       expect(result.latestVersion).toBe('v2.0.0-beta.1');
     });
 
-    it('should assume update available when version not found in releases', async () => {
+    it('should return no update available when version not found in releases', async () => {
       const notifier = new ReleaseNotifier({ repo: 'test/repo', checkInterval: 0 });
       const result = await notifier.checkVersion('v0.0.1');
 
-      expect(result.updateAvailable).toBe(true);
+      expect(result.updateAvailable).toBe(false);
       expect(result.latestVersion).toBe('v2.0.0');
     });
 

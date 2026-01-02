@@ -106,11 +106,11 @@ export class ReleaseNotifier {
         };
       }
 
-      // Find the current release by tag name
-      const normalizedCurrent = this.normalizeVersion(currentVersion);
+      // Find the current release by tag name (with or without 'v' prefix)
       const currentRelease = releases.find(r =>
-        this.normalizeVersion(r.tag_name) === normalizedCurrent ||
-        r.tag_name === currentVersion
+        r.tag_name === currentVersion ||
+        r.tag_name === `v${currentVersion}` ||
+        r.tag_name.replace(/^v/i, '') === currentVersion.replace(/^v/i, '')
       );
 
       // Get the latest release based on isPrerelease flag
@@ -136,10 +136,11 @@ export class ReleaseNotifier {
         publishedAt: latestRelease.published_at,
       };
 
-      // If current release not found in releases, assume update is available
+      // If current release not found in releases, we can't reliably compare
+      // Return no update available since the current version may be newer than anything in the list
       if (!currentRelease) {
         return {
-          updateAvailable: true,
+          updateAvailable: false,
           currentVersion,
           latestVersion: latestRelease.tag_name,
           latestRelease: latest,
@@ -267,13 +268,6 @@ export class ReleaseNotifier {
     catch {
       // Silently fail if we can't write to disk
     }
-  }
-
-  /**
-   * Normalizes a version string by removing 'v' prefix and cleaning whitespace
-   */
-  private normalizeVersion(version: string): string {
-    return version.trim().replace(/^v/i, '');
   }
 
   /**

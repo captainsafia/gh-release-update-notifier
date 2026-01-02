@@ -96,10 +96,11 @@ describe('Integration Tests (captainsafia/burrow)', () => {
         return;
       }
 
-      // Use a version that definitely doesn't exist to trigger update available
-      const result = await notifier.checkVersion('v0.0.0-nonexistent');
+      // Use an actual older stable version that exists in the repo
+      // v1.1.0 is an older stable release compared to latest
+      const result = await notifier.checkVersion('v1.1.0');
 
-      expect(result.currentVersion).toBe('v0.0.0-nonexistent');
+      expect(result.currentVersion).toBe('v1.1.0');
       expect(result.updateAvailable).toBe(true);
       expect(result.latestVersion).toBe(latestStableRelease.tagName);
       expect(result.latestRelease).not.toBeNull();
@@ -125,10 +126,11 @@ describe('Integration Tests (captainsafia/burrow)', () => {
         return;
       }
 
-      // Use a version that doesn't exist to trigger update available
-      const result = await notifier.checkVersion('v0.0.0-alpha.0', true);
+      // Use an actual older prerelease version that exists in the repo
+      // v1.0.0-preview.83c5906 is an older prerelease compared to latest
+      const result = await notifier.checkVersion('v1.0.0-preview.83c5906', true);
 
-      expect(result.currentVersion).toBe('v0.0.0-alpha.0');
+      expect(result.currentVersion).toBe('v1.0.0-preview.83c5906');
       expect(result.updateAvailable).toBe(true);
       expect(result.latestVersion).toBe(latestPrerelease.tagName);
     });
